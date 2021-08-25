@@ -33,7 +33,7 @@ object Main extends Logging {
   }
   def generateTab2(spark: SparkSession, sc: SparkContext): Unit = {
 
-    val path = "C:/Users/32006/IdeaProjects/sparklineage/"
+    val path = "./"
     val file1 = path + "data/in/user"
     val file2 = path + "data/in/sales"
 
