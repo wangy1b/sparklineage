@@ -1,5 +1,4 @@
-package com.wyb.spark.lineage.test
-
+package com.wyb.spark.lineage.tab2Tab
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan

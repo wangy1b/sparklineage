@@ -1,4 +1,4 @@
-package com.wyb.spark.lineage.test
+package com.wyb.spark.lineage.tab2Tab
 
 import org.apache.spark.sql.SparkSession
 
@@ -15,7 +15,10 @@ object SparkLineageApp extends App {
       }
       .getOrCreate()
 
-  spark.sql("""insert into t2 partition (dt='2021')  select id ,"dix" as name from t1 """)
+  //spark.sql("""create table t1 as select 1 as id ,"dix" as name """)
+  spark.sql("""create table t2(id int,name string) partitioned by (dt string)""")
+  println("**********")
+  spark.sql("""insert into t2 partition (dt='2021')  select id ,name from t1 """)
 
   spark.stop()
 }
