@@ -64,7 +64,7 @@ object Main extends Logging {
   }
 
 
-  def main(args: Array[String]): Unit = {
+  def test1: Unit = {
 
     val reporter: InMemoryReporter = InMemoryReporter(compression = None)
     val listener: SparkSqlLineageListener = SparkSqlLineageListener(List(reporter), async = false)
@@ -128,6 +128,30 @@ object Main extends Logging {
     //  .mode("overwrite")
     //  .format("csv")
     //  .save("data/out/report")
+  }
+
+
+  def test2: Unit = {
+    val spark = SparkSession.builder()
+        .appName("test")
+        .enableHiveSupport()
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        .master("local[*]")
+        .config("hive.exec.dynamic.partition.mode", "nonstrict")
+        // 指定自定义血缘提取插件
+        .getOrCreate()
+
+    spark.listenerManager.register(new MyQueryExecutionListener)
+    //spark.sql("""create table t1 as select 1 as id ,"dix" as name """)
+    //spark.sql("""create table t2(id int,name string) partitioned by (dt string)""")
+    println("**********")
+    spark.sql("""insert into t2 partition (dt='2021')  select id ,name from t1 """)
+
+    spark.stop()
+  }
+
+  def main(args: Array[String]): Unit = {
+    test2
   }
 
 }

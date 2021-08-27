@@ -200,14 +200,13 @@ object DataFlow {
         case "subQueryAlias" =>
           val id: String = randomString
           val cur = json
-          var tmp = List[String]()
         // 嵌套取数组中某个字段值，并添加过滤
-          tmp = for {
-            JField("alias", JString(alias)) <- json
+          val tmp: List[String] = for {
             JObject(child) <- json
+            JField("alias", JString(alias)) <- child
           } yield alias
 
-          val node = Node(id, "subQueryAlias", tmp)
+          val node = Node(id, "subQueryAlias", List(tmp.reverse.mkString(" as ")))
           node ::Nil
 
         case _ =>

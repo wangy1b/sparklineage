@@ -11,7 +11,8 @@ case class SparkSqlLineageExtension(spark: SparkSession) extends Rule[LogicalPla
     case _ =>
       val linege = new SparkLineageUtil()
 
-      println(linege.resolveLogicPlan(plan, "default"))
+      val tuple2 = linege.resolveLogicPlan(plan, "default")
+      logInfo(tuple2.toString())
       plan
   }
 }

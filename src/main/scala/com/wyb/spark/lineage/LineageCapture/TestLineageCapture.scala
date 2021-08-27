@@ -6,7 +6,7 @@ import com.wyb.spark.lineage.test.Main
 
 import scala.util.Random
 
-object Test {
+object TestLineageCapture {
 
   def getSpark(): SparkSession = {
     // only instantiate Spark once the HDFS cluster is up
@@ -28,6 +28,8 @@ object Test {
     val listener: DataLineageQueryExecutionListener =
       new DataLineageQueryExecutionListener()
 
+    val jslist = listener.jslist
+
     getSpark().listenerManager.register(
       listener
     )
@@ -37,14 +39,14 @@ object Test {
         .options(Map("multiline" -> "true"))
         .load("data/in/lineagecap/characters.json")
 
-    characters.show()
+    //characters.show()
 
     val locations: DataFrame = getSpark().read
         .format("json")
         .options(Map("multiline" -> "true"))
         .load("data/in/lineagecap/locations.json")
 
-    locations.show()
+    //locations.show()
 
     val df = characters
         .join(locations, characters("location.url") === locations("url"))
@@ -62,7 +64,22 @@ object Test {
     //df.createOrReplaceTempView("t1")
     //getSpark().sql("create table t11 as select * from t1")
 
-    df.write.format("parquet").save("data/out/charactersWithLocation.parquet")
+
+
+    df.write.mode("overwrite").format("parquet").save("data/out/charactersWithLocation.parquet")
+
+    val lastJslog = jslist.last
+    println( lastJslog.length )
+
+    val graphs: List[GraphElement] =
+      DataFlow.transform(
+        org.json4s.jackson.JsonMethods.parse(lastJslog)
+      )
+
+    val dots: String =
+      FlowToDot.graphToDot(graphs)
+
+    println(dots)
   }
 
   def test2: Unit = {
@@ -119,14 +136,13 @@ object Test {
 
     val graphs: List[GraphElement] = DataFlow.transform(org.json4s.jackson.JsonMethods.parse(lastJslog))
 
-
-
     val dots: String = FlowToDot.graphToDot(graphs)
     println(dots)
   }
 
   def main(args: Array[String]): Unit = {
-    test2
+    test1
+    //test2
   }
 
 }
