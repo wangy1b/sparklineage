@@ -4,6 +4,7 @@ import java.io.File
 
 import org.apache.commons.lang3.SystemUtils
 import org.apache.hadoop.fs.{LocatedFileStatus, Path, RemoteIterator}
+import org.apache.hadoop.fs.FileUtil
 
 object TestMiniHdfs extends EmbeddedHdfsSpark {
   def main(args: Array[String]): Unit = {
@@ -20,7 +21,9 @@ object TestMiniHdfs extends EmbeddedHdfsSpark {
     copyFromLocal("data/in/lineagecap/characters.json", "/characters.json")
     copyFromLocal("data/in/lineagecap/locations.json", "/locations.json")
 
-    fileSystem.delete(new Path("/"),true)
+    //fileSystem.delete(new Path("/"),true)
+    println(new File("/").getAbsoluteFile())
+    //FileUtil.fullyDelete()
 
     val ss: RemoteIterator[LocatedFileStatus] = fileSystem.listFiles(new Path("/"),false)
     while (ss.hasNext) {

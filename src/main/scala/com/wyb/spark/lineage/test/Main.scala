@@ -139,18 +139,43 @@ object Main extends Logging {
         .master("local[*]")
         .config("hive.exec.dynamic.partition.mode", "nonstrict")
         // 指定自定义血缘提取插件
+        .config(
+          "spark.sql.warehouse.dir",
+          "spark-warehouse"
+        )
+            //.config("ha","")
         .getOrCreate()
 
     spark.listenerManager.register(new MyQueryExecutionListener)
     //spark.sql("""create table t1 as select 1 as id ,"dix" as name """)
     //spark.sql("""create table t2(id int,name string) partitioned by (dt string)""")
     println("**********")
-    spark.sql("""insert into t2 partition (dt='2021')  select id ,name from t1 """)
+    //spark.sql("""insert into t2 partition (dt='2021')  select id ,name from t1 """)
 
+
+    val txt = s"""|insert into table test.res
+                 |select u.name,sum(s.cnt) as sum_cnt
+                 |from test.user u
+                 |join test.sales s
+                 |on u.id = s.id
+                 |group by name
+                 |""".stripMargin
+    spark.sql(txt)
+
+
+    val t1 =
+      s"""
+         |create table test.t1 as
+         |select a.* from test.res a
+         |join test.user u
+         |on u.name = a.name
+       """.stripMargin
+    spark.sql(t1)
     spark.stop()
   }
 
   def main(args: Array[String]): Unit = {
+    //test1
     test2
   }
 
